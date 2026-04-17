@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hover Effect</title>
+    <style>
+      body {
+        font-family: Inter, sans-serif;
+        margin: 0;
+        padding: 16px;
+        color: #222;
+      }
+
+      .wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      h2 {
+        margin: 0 0 4px;
+        font-size: 16px;
+      }
+
+      p {
+        margin: 0;
+        font-size: 12px;
+        color: #666;
+      }
+
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      input[type='color'],
+      input[type='number'] {
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      input[type='number'] {
+        padding: 8px;
+        font-size: 12px;
+      }
+
+      .buttons {
+        display: flex;
+        gap: 8px;
+        margin-top: 4px;
+      }
+
+      button {
+        border: none;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .primary {
+        background: #0d99ff;
+        color: white;
+      }
+
+      .secondary {
+        background: #f0f0f0;
+        color: #222;
+      }
+
+      .danger {
+        background: #ffe8e8;
+        color: #b42318;
+      }
+
+      #status {
+        min-height: 18px;
+        font-size: 12px;
+      }
+
+      .error {
+        color: #b42318;
+      }
+
+      .success {
+        color: #067647;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div>
+        <h2>Hover Effect</h2>
+        <p>Select one element, then apply or undo the hover border effect.</p>
+      </div>
+
+      <label>
+        Hover color
+        <input id="color" type="color" value="#0D99FF" />
+      </label>
+
+      <label>
+        Weight
+        <input id="weight" type="number" min="1" step="1" value="2" />
+      </label>
+
+      <div class="buttons">
+        <button class="primary" id="apply">Apply Hover</button>
+        <button class="danger" id="undo">Undo Hover</button>
+        <button class="secondary" id="close">Close</button>
+      </div>
+
+      <div id="status"></div>
+    </div>
+
+    <script>
+      const colorInput = document.getElementById('color');
+      const weightInput = document.getElementById('weight');
+      const applyButton = document.getElementById('apply');
+      const undoButton = document.getElementById('undo');
+      const closeButton = document.getElementById('close');
+      const status = document.getElementById('status');
+
+      function setStatus(message, type) {
+        status.textContent = message;
+        status.className = type;
+      }
+
+      applyButton.onclick = () => {
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: 'apply-hover',
+              color: colorInput.value,
+              weight: weightInput.value,
+            },
+          },
+          '*'
+        );
+      };
+
+      undoButton.onclick = () => {
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: 'undo-hover',
+            },
+          },
+          '*'
+        );
+      };
+
+      closeButton.onclick = () => {
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: 'close-plugin',
+            },
+          },
+          '*'
+        );
+      };
+
+      window.onmessage = (event) => {
+        const msg = event.data.pluginMessage;
+        if (!msg) return;
+
+        if (msg.type === 'error') {
+          setStatus(msg.message, 'error');
+        }
+
+        if (msg.type === 'success') {
+          setStatus(msg.message, 'success');
+        }
+      };
+    </script>
+  </body>
+</html>
